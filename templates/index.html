@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <title>Title</title>
+</head>
+<body>
+    <div class="main row">
+        <div class="dataTable col-9">
+            <table class="table">
+                <thead>
+                    <th scope="col">#</th>
+                    {% for label in data[0] %}
+                        <th scope="col">{{ label }}</th>
+                    {% endfor %}
+                </thead>
+                <tbody>
+                    {% for row in data[1:] %}
+                        <tr>
+                            <th scope="row">{{ loop.index + start_index }}</th>
+                            {% for elem in row %}
+                                <td>{{ elem }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="configuration col-2 m-1">
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="formFile" class="form-label">CSV file</label>
+                    <input class="form-control" type="file" id="formFile" name="formFile">
+                </div>
+                <div class="mb-3">
+                    <label for="formFile" class="form-label">Range Columns</label>
+                    <div class="row">
+                        <div class="col">
+                            <input class="form-control" type="number" name="minCol" id="minCol" placeholder="Start">
+                        </div>
+                        <div class="col">
+                            <input class="form-control" type="number" name="maxCol" id="maxCol" placeholder="End">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="formFile" class="form-label">Range Rows</label>
+                    <div class="row">
+                        <div class="col">
+                            <input class="form-control" type="number" name="minRow" id="minRow" placeholder="Start">
+                        </div>
+                        <div class="col">
+                            <input class="form-control" type="number" name="maxRow" id="maxRow" placeholder="End">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary mb-3">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
