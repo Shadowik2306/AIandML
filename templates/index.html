@@ -8,8 +8,8 @@
 </head>
 <body>
     <div class="main row">
-        <div class="dataTable col-9">
-            <table class="table">
+        <div class="dataTable col">
+            <table class="table table-sm">
                 <thead>
                     <th scope="col">#</th>
                     {% for label in data[0] %}
@@ -28,7 +28,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="configuration col-2 m-1">
+        <div class="configuration col m-1">
             <form method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="formFile" class="form-label">CSV file</label>
