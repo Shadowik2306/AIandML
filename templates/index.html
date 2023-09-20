@@ -8,6 +8,8 @@
 </head>
 <body>
     <div class="main row">
+    <h1>Экономические данные - 9 стран</h1>
+        <p>Набор данных содержит данные по 8 странам и одному специальному административному району (Китай, Франция, Германия, Гонконг, Индия, Япония, Испания, Соединенное Королевство и Соединенные Штаты Америки) за период с 1980 по 2020 год. Он включает в себя основные макроэкономические факторы, такие как инфляция, безработица, ВВП, обменный курс (базовый доллар США) и доход на душу населения. Кроме того, в нем представлены цены акций основного фондового индекса соответствующей страны, которые могут помочь в анализе набора данных для определения влияния основных макроэкономических переменных на динамику цен фондовых индексов.</p>
         <div class="dataTable col">
             <table class="table table-sm">
                 <thead>
@@ -25,9 +27,29 @@
                             {% endfor %}
                         </tr>
                     {% endfor %}
+                    <tr>
+                        <th scope="row">Type</th>
+                        {% for elem in types %}
+                            <td>{{ elem }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Null</th>
+                        {% for elem in null_el %}
+                            <td>{{ elem }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th scope="row">NotNull</th>
+                        {% for elem in not_null_el %}
+                            <td>{{ elem }}</td>
+                        {% endfor %}
+                    </tr>
                 </tbody>
             </table>
+
         </div>
+
         <div class="configuration col m-1">
             <form method="post" enctype="multipart/form-data">
                 <div class="mb-3">
@@ -57,9 +79,25 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <button type="submit" class="btn btn-primary mb-3">Generate</button>
+                    <button type="submit" class="btn btn-primary mb-3" name="btn" value="New Table">Generate</button>
                 </div>
             </form>
+            {% if data != [] %}
+                <form method="post" class="row">
+                    <select name="group_by_col" class="form-select form-select-lg mb-3 col">
+                        <option value="1">Countries</option>
+                        <option value="2">Years</option>
+                    </select>
+                    <select name="data_by_col" class="form-select form-select-lg mb-3 col">
+                        <option value="1">Oil Price</option>
+                        <option value="2">Unemployment</option>
+                        <option value="3">Oil Price & Unemployment</option>
+                    </select>
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary mb-3" name="btn" value="Group_By">Generate</button>
+                    </div>
+                </form>
+            {% endif %}
         </div>
     </div>
 </body>
