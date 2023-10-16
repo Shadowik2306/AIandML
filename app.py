@@ -188,8 +188,7 @@ def hello_world():  # put application's code here
 
 if __name__ == '__main__':
     try:
-        # os.remove("static/myPlot1.png")
-        os.remove("static/myPlot2.png")
+        os.remove("static/myPlot.png")
     except:
         pass
 
