@@ -2,14 +2,34 @@ import os
 from io import StringIO
 
 import pandas
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import matplotlib.pyplot as plt
 
+from extra.SiteFilter import SiteFilter
+
 original_table: pd.DataFrame = pd.DataFrame()
 extra_data_table: pd.DataFrame
 table = []
+site_filter = SiteFilter()
+
+site_filter.add_url("https://www.kaggle.com/datasets/psycon/daily-coffee-price/data", [
+    "Date", "Open", "High", "Low", "Close", "Volume", "Currency"
+])
+site_filter.add_url("https://www.kaggle.com/datasets/mohit2512/jio-mart-product-items", [
+    "category", "sub_category", "href", "items", "price"
+])
+site_filter.add_url("https://www.kaggle.com/datasets/sadeghjalalian/ufo-sightings-in-usa/data", [
+    "summary", "city", "state", "shape", "duration", "stats", "report_link", "text", "posted"
+])
+site_filter.add_url("https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database", [
+    "Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction", "Age", "Outcome"
+])
+site_filter.add_url("https://www.kaggle.com/datasets/harlfoxem/housesalesprediction", [
+    "date", "price", "bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors", "waterfront", "view"
+])
+
 
 def ignore_exception(IgnoreException=Exception, DefaultVal=None):
     def dec(function):
@@ -181,9 +201,31 @@ def hello_world():  # put application's code here
     params["not_null_el"] = data["not_null_el"]
     params["data"] = table
 
-
-
     return render_template("index.html", **params)
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def bloom_filter_search():  # put application's code here
+    params = {
+        "state": 0,
+        "key": "",
+        "url": []
+    }
+    if request.method == "POST":
+        val = request.form["url_input"]
+        if not val:
+            return render_template("bloom.html", **params)
+        if (int(request.form["state"]) <= 0) or (val != request.form["last_word"]):
+            if site_filter.contains(val):
+                params["state"] = 1
+            else:
+                params["state"] = -1
+            params["key"] = val
+        else:
+            params["urls"] = site_filter.get_url(val)
+            params["state"] = 0
+
+    return render_template("bloom.html", **params)
 
 
 if __name__ == '__main__':
