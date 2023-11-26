@@ -1,6 +1,7 @@
 import os
 from io import StringIO
 
+import numpy
 import pandas
 from flask import Flask, render_template, request, redirect
 import pandas as pd
@@ -13,6 +14,8 @@ original_table: pd.DataFrame = pd.DataFrame()
 extra_data_table: pd.DataFrame
 table = []
 site_filter = SiteFilter()
+b0, b1, r = 0, 0, 0
+
 
 site_filter.add_url("https://www.kaggle.com/datasets/psycon/daily-coffee-price/data", [
     "Date", "Open", "High", "Low", "Close", "Volume", "Currency"
@@ -43,6 +46,30 @@ def ignore_exception(IgnoreException=Exception, DefaultVal=None):
 
     return dec
 
+# Детерминации и график рассеивания
+def linear_regression():
+    global b0, b1, r
+    if original_table.empty:
+        return
+    n = len(original_table.dropna(subset=['unemploymentrate', 'oil prices']))
+    x = original_table.dropna(subset=['unemploymentrate', 'oil prices'])["unemploymentrate"]  # x
+    y = original_table.dropna(subset=['unemploymentrate', 'oil prices'])["oil prices"]  # y
+
+    sum_x = sum(x)
+    sum_y = sum(y)
+    sum_xy = sum(x * y)
+    sum_xx = sum(x * x)
+
+    b1 = (sum_xy - (sum_y * sum_x) / n) / (sum_xx - sum_x ** 2 / n)
+    b0 = (sum_y - b1 * sum_x) / n
+    r = (sum((x * b1 + b0) * (x * b1 + b0)) - n * y.mean() * y.mean()) / (sum(y * y) - n * y.mean() * y.mean())
+
+    print(b1, b0)
+
+    plt.scatter(x, y)
+    plt.plot(x, [i * b0 + b1 for i in x], color="r")
+    plt.savefig("/home/shadowik/PycharmProjects/AIandML/static/linearRegression.png")
+    plt.show()
 
 def format_table(df):
     global table
@@ -59,14 +86,8 @@ def upload_table(data=None, min_col=-1, max_col=-1, min_row=-1, max_row=-1, new_
         csv_string_io = StringIO(data)
         original_table = pd.read_csv(csv_string_io, sep=",")
 
+        linear_regression()
         add_similar_data()
-        # try:
-        #     original_table.groupby("country")["log_indexprice"].mean().plot(kind="bar", figsize=(10, 5), rot=10)
-        #     plt.savefig("static/myPlot2.png")
-        #     plt.show()
-        #
-        # except Exception as e:
-        #     print(e)
 
     min_row = min_row - 1 if min_row else 0
     max_row = max_row if max_row else len(original_table.index)
@@ -105,7 +126,7 @@ def collect_min_max_mean(group_by_column: str, collect_by_column: str):
 
     try:
         grouped_table.agg(**columns).plot( figsize=(10, 5), rot=10, ax=ax)
-        plt.savefig("static/myPlot.png")
+        plt.savefig("/home/shadowik/PycharmProjects/AIandML/static/myPlot.png")
         plt.show()
     except Exception as e:
         print(e)
@@ -172,7 +193,7 @@ def hello_world():  # put application's code here
         "start_index": 0,
         "types": [],
         "null_el": [],
-        "not_null_el": []
+        "not_null_el": [],
     }
 
     data = {
@@ -200,7 +221,9 @@ def hello_world():  # put application's code here
     params["null_el"] = data["null_el"]
     params["not_null_el"] = data["not_null_el"]
     params["data"] = table
-
+    params["a"] = b0
+    params["b"] = b1
+    params["r"] = r
     return render_template("index.html", **params)
 
 
@@ -230,7 +253,10 @@ def bloom_filter_search():  # put application's code here
 
 if __name__ == '__main__':
     try:
+        print(__file__)
         os.remove("static/myPlot.png")
+        os.remove("static/linearRegression.png")
+
     except:
         pass
 
