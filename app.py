@@ -1,4 +1,5 @@
 import os
+import sys
 from io import StringIO
 
 import numpy
@@ -8,6 +9,7 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import matplotlib.pyplot as plt
 
+from extra.DecisionTree import DecisionTree
 from extra.SiteFilter import SiteFilter
 
 original_table: pd.DataFrame = pd.DataFrame()
@@ -69,7 +71,6 @@ def linear_regression():
     plt.scatter(x, y)
     plt.plot(x, [i * b0 + b1 for i in x], color="r")
     plt.savefig("/home/shadowik/PycharmProjects/AIandML/static/linearRegression.png")
-    plt.show()
 
 def format_table(df):
     global table
@@ -127,7 +128,6 @@ def collect_min_max_mean(group_by_column: str, collect_by_column: str):
     try:
         grouped_table.agg(**columns).plot( figsize=(10, 5), rot=10, ax=ax)
         plt.savefig("/home/shadowik/PycharmProjects/AIandML/static/myPlot.png")
-        plt.show()
     except Exception as e:
         print(e)
 
@@ -249,6 +249,20 @@ def bloom_filter_search():  # put application's code here
             params["state"] = 0
 
     return render_template("bloom.html", **params)
+
+
+@app.route("/decision_tree", methods=["GET", "POST"])
+def decision_tree():
+    if original_table.empty:
+        return redirect("/")
+    a = DecisionTree(original_table.iloc[:int(len(original_table) * 0.75)], "oil prices", ["year", "country"])
+
+    k = a.check_data(original_table.iloc[int(len(original_table) * 0.75):])
+    params = {
+        "json_tree": str(a.get_json()),
+        "avg_sqr_err": k
+    }
+    return render_template("Decision Tree.html", **params)
 
 
 if __name__ == '__main__':
