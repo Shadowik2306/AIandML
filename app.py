@@ -9,6 +9,7 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import matplotlib.pyplot as plt
 
+from extra.ClusterAnalysis import ClusterAnalysis
 from extra.DecisionTree import DecisionTree
 from extra.SiteFilter import SiteFilter
 
@@ -48,7 +49,6 @@ def ignore_exception(IgnoreException=Exception, DefaultVal=None):
 
     return dec
 
-# Детерминации и график рассеивания
 def linear_regression():
     global b0, b1, r
     if original_table.empty:
@@ -71,6 +71,7 @@ def linear_regression():
     plt.scatter(x, y)
     plt.plot(x, [i * b0 + b1 for i in x], color="r")
     plt.savefig("/home/shadowik/PycharmProjects/AIandML/static/linearRegression.png")
+    plt.show()
 
 def format_table(df):
     global table
@@ -263,6 +264,15 @@ def decision_tree():
         "avg_sqr_err": k
     }
     return render_template("Decision Tree.html", **params)
+
+
+@app.route("/cluster", methods=["GET", "POST"])
+def cluster_analysis():
+    if original_table.empty:
+        return redirect("/")
+    a = ClusterAnalysis(original_table, ["unemploymentrate", "oil prices"])
+    a.visualize()
+    return render_template("cluster.html")
 
 
 if __name__ == '__main__':
