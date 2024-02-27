@@ -51,7 +51,6 @@ class GenericMethod:
             for cross in range(child_count):
                 try:
                     a, b = self._choices_no_replacement(generation, chance)
-
                     arr = np.concatenate((a[:data.fields_count / 2], b[data.fields_count/2:]))
                 except:
                     arr = self._choices_no_replacement(generation, chance, k=1)[0]
